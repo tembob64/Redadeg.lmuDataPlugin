@@ -40,28 +40,31 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,2,0,2" TextWrapping="Wrap" Text="Update data thread time out:" Width="153" Grid.Row="1" ToolTip="Update data thread timeout in millisecond. for 50FPS set 20 (1000/20=50 )"/>
-                    <Custom:NumericUpDown x:Name="DataUpdateThreadTimeout" ValueChanged="DataUpdateThreadTimeout_ValueChanged"  Margin="0,2,0,2" Width="180" Grid.Row="1" Grid.Column="1" ToolTip="Update data thread timeout in millisecond. for 50FPS set 20 (1000/20=50 )"  Minimum="5" Maximum="2000"/>
+                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,2,0,2" TextWrapping="Wrap" Text="Session info - API Delay" Width="153" Grid.Row="1" ToolTip="Update the waiting time between request in millisecond. Data received are used for wheather, session info etc.   /!\ Below 200ms, it can make the in-game pitmenu flickering"/>
+                    <Custom:NumericUpDown x:Name="DataUpdateThreadTimeout" ValueChanged="DataUpdateThreadTimeout_ValueChanged"  Margin="0,2,0,2" Width="180" Grid.Row="1" Grid.Column="1" ToolTip="Time in ms.  There is 5 requests so frequency update = 5 * value"  Minimum="20" Maximum="2000"/>
 
-                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,2,0,2" TextWrapping="Wrap" Text="Get memory data thread timeout:" Width="153" Grid.Row="2" ToolTip="Get memory data thread timeout in millisecond. for 20FPS set 50 (1000/50=20 )"/>
-                    <Custom:NumericUpDown x:Name="GetMemoryDataThreadTimeout" ValueChanged="GetMemoryDataThreadTimeout_ValueChanged"  Margin="0,2,0,2" Width="180" Grid.Row="2" Grid.Column="1" ToolTip="Get memory data thread timeout in millisecond. for 20FPS set 50 (1000/50=20 )"  Minimum="50" Maximum="2000"/>
+                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,2,0,2" TextWrapping="Wrap" Text="Consumption - API Delay" Width="153" Grid.Row="2" ToolTip="Update the waiting time between request in millisecond. Data received are used for consumption etc.    /!\ It can make the in-game pitmenu flickering"/>
+                    <Custom:NumericUpDown x:Name="ConsUpdateThreadTimeout" ValueChanged="ConsUpdateThreadTimeout_ValueChanged"  Margin="0,2,0,2" Width="180" Grid.Row="2" Grid.Column="1" ToolTip="Time in ms, read frequency = (1000 / value) read/s"  Minimum="20" Maximum="2000"/>
 
-                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,2,0,2" TextWrapping="Wrap" Text="After bind next key Refresh" Width="153" Grid.Row="7" ToolTip="Bind PIT STOP EVERLAY DECREMET KEY"/>
-                    <Button x:Name="refresh_button" HorizontalAlignment="Center" Height="15" Margin="0,2,0,2"  Width="180" Grid.Row="7" Grid.Column="1" ToolTip="Bind PIT STOP EVERLAY UP KEY" Click="refresh_button_Click" >
-                        <TextBlock x:Name="refresh_button_text" Text="Refresh" TextAlignment="Center" HorizontalAlignment="Center" Height="24"   Width="180" Grid.Row="7" Grid.Column="1" />
+                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,2,0,2" TextWrapping="Wrap" Text="MemoryShared - Read Delay" Width="153" Grid.Row="3" ToolTip="Update the waiting time between read in millisecond. Data received are car setting update : TC, ABS, etc."/>
+                    <Custom:NumericUpDown x:Name="GetMemoryDataThreadTimeout" ValueChanged="GetMemoryDataThreadTimeout_ValueChanged"  Margin="0,2,0,2" Width="180" Grid.Row="3" Grid.Column="1" ToolTip="Time in ms, read frequency = (1000 / value) read/s"  Minimum="50" Maximum="2000"/>
+
+                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,7,0,8" TextWrapping="Wrap" Text="Real time clock in session tab" Width="175" Grid.Row="4"/>
+                    <CheckBox x:Name="RealTimeClock" HorizontalAlignment="Center" Height="15" Margin="0,2,0,2"  Width="180" Grid.Row="4" Grid.Column="1" ToolTip="Real time clock in session tab" Checked="RealTimeClock_Checked" Unchecked="RealTimeClock_unChecked"/>
+
+                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,7,0,8" TextWrapping="Wrap" Text="24 hour clock format" Width="175" Grid.Row="5"/>
+                    <CheckBox x:Name="clock_format24" HorizontalAlignment="Center" Height="15" Margin="0,2,0,2"  Width="180" Grid.Row="5" Grid.Column="1" ToolTip="24 hour clock format in Session tab" Checked="clock_format24_Checked" Unchecked="clock_format24_unChecked"/>
+
+                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,2,0,2" TextWrapping="Wrap" Text="Refresh UI" Width="153" Grid.Row="10" ToolTip="Refresh displayed settings from internal value loaded"/>
+                    <Button x:Name="refresh_button" HorizontalAlignment="Center" Height="15" Margin="0,2,0,2"  Width="180" Grid.Row="10" Grid.Column="1" ToolTip="Refresh displayed settings from internal value loaded" Click="refresh_button_Click" >
+                        <TextBlock x:Name="refresh_button_text" Text="Refresh" TextAlignment="Center" HorizontalAlignment="Center" Height="24"   Width="180" Grid.Row="10" Grid.Column="1" />
                     </Button>
 
-                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,7,0,8" TextWrapping="Wrap" Text="Real time clock in session tab" Width="175" Grid.Row="9"/>
-                    <CheckBox x:Name="RealTimeClock" HorizontalAlignment="Center" Height="15" Margin="0,2,0,2"  Width="180" Grid.Row="9" Grid.Column="1" ToolTip="Real time clock in session tab" Checked="RealTimeClock_Checked" Unchecked="RealTimeClock_unChecked"/>
-
-                    <TextBlock HorizontalAlignment="Left" Height="15" Margin="0,7,0,8" TextWrapping="Wrap" Text="24 hour clock format" Width="175" Grid.Row="10"/>
-                    <CheckBox x:Name="clock_format24" HorizontalAlignment="Center" Height="15" Margin="0,2,0,2"  Width="180" Grid.Row="10" Grid.Column="1" ToolTip="24 hour clock format in Session tab" Checked="clock_format24_Checked" Unchecked="clock_format24_unChecked"/>
-
-                    <TextBlock x:Name="message_text" Margin="0,0,0,0" TextWrapping="Wrap" Text="" Grid.Row="12" Grid.RowSpan="2"  Grid.Column="0" Grid.ColumnSpan="2"  VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#FFF70808"/>
+                    <TextBlock x:Name="message_text" Margin="0,0,0,0" TextWrapping="Wrap" Text="" Grid.Row="11" Grid.RowSpan="2"  Grid.Column="0" Grid.ColumnSpan="2"  VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#FFF70808"/>
                 </Grid>
                 <TextBlock TextWrapping="Wrap" Text="Plugin Description" FontWeight="Bold" Margin="0,0,0,5"/>
                 <TextBlock TextWrapping="Wrap" Text="This plugin"/>
-                <TextBlock TextWrapping="Wrap" Text="Plugin Version 1.4.5" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBlock TextWrapping="Wrap" Text="Plugin Version 1.5.0" FontWeight="Bold" Margin="0,10,0,0"/>
 
 
             </StackPanel>

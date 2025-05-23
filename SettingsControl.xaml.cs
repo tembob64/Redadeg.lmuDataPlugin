@@ -5,6 +5,8 @@ using Newtonsoft.Json.Linq; // Needed for JObject
 using System.IO;    // Needed for read/write JSON settings file
 using SimHub;   // Needed for Logging
 using System.Windows.Markup;
+using System.Threading.Tasks;
+
 
 namespace Redadeg.lmuDataPlugin
 {
@@ -34,13 +36,15 @@ namespace Redadeg.lmuDataPlugin
                 ButtonBindSettings.Clock_Format24 = JSONSettingsdata["Clock_Format24"] != null ? (bool)JSONSettingsdata["Clock_Format24"] : false;
                 ButtonBindSettings.RealTimeClock = JSONSettingsdata["RealTimeClock"] != null ? (bool)JSONSettingsdata["RealTimeClock"] : false;
                 ButtonBindSettings.GetMemoryDataThreadTimeout = JSONSettingsdata["GetMemoryDataThreadTimeout"] != null ? (int)JSONSettingsdata["GetMemoryDataThreadTimeout"] : 50;
-                ButtonBindSettings.DataUpdateThreadTimeout = JSONSettingsdata["DataUpdateThreadTimeout"] != null ? (int)JSONSettingsdata["DataUpdateThreadTimeout"] : 100;
+                ButtonBindSettings.DataUpdateThreadTimeout = JSONSettingsdata["DataUpdateThreadTimeout"] != null ? (int)JSONSettingsdata["DataUpdateThreadTimeout"] : 400;
+                ButtonBindSettings.ConsUpdateThreadTimeout = JSONSettingsdata["ConsUpdateThreadTimeout"] != null ? (int)JSONSettingsdata["ConsUpdateThreadTimeout"] : 100;
             }
             catch { }
             clock_format24.IsChecked = ButtonBindSettings.Clock_Format24;
             RealTimeClock.IsChecked = ButtonBindSettings.RealTimeClock;
             GetMemoryDataThreadTimeout.Value = ButtonBindSettings.GetMemoryDataThreadTimeout;
             DataUpdateThreadTimeout.Value = ButtonBindSettings.DataUpdateThreadTimeout;
+            ConsUpdateThreadTimeout.Value = ButtonBindSettings.ConsUpdateThreadTimeout;
         }   
         public  void Refresh(string _Key)
         {
@@ -52,7 +56,8 @@ namespace Redadeg.lmuDataPlugin
                 ButtonBindSettings.Clock_Format24 = JSONSettingsdata["Clock_Format24"] != null ? (bool)JSONSettingsdata["Clock_Format24"] : false;
                 ButtonBindSettings.RealTimeClock = JSONSettingsdata["RealTimeClock"] != null ? (bool)JSONSettingsdata["RealTimeClock"] : false;
                 ButtonBindSettings.GetMemoryDataThreadTimeout = JSONSettingsdata["GetMemoryDataThreadTimeout"] != null ? (int)JSONSettingsdata["GetMemoryDataThreadTimeout"] : 50;
-                ButtonBindSettings.DataUpdateThreadTimeout = JSONSettingsdata["DataUpdateThreadTimeout"] != null ? (int)JSONSettingsdata["DataUpdateThreadTimeout"] : 20;
+                ButtonBindSettings.DataUpdateThreadTimeout = JSONSettingsdata["DataUpdateThreadTimeout"] != null ? (int)JSONSettingsdata["DataUpdateThreadTimeout"] : 400;
+                ButtonBindSettings.ConsUpdateThreadTimeout = JSONSettingsdata["ConsUpdateThreadTimeout"] != null ? (int)JSONSettingsdata["ConsUpdateThreadTimeout"] : 100;
             }
             catch { }
             base.Dispatcher.InvokeAsync(delegate
@@ -73,6 +78,12 @@ namespace Redadeg.lmuDataPlugin
                 lock (DataUpdateThreadTimeout)
                 {
                     DataUpdateThreadTimeout.Value = ButtonBindSettings.DataUpdateThreadTimeout;
+
+                }
+
+                lock (ConsUpdateThreadTimeout)
+                {
+                    ConsUpdateThreadTimeout.Value = ButtonBindSettings.ConsUpdateThreadTimeout;
 
                 }
 
@@ -116,26 +127,31 @@ namespace Redadeg.lmuDataPlugin
 
         private void refresh_button_Click(object sender, RoutedEventArgs e)
         {
-
             clock_format24.IsChecked = ButtonBindSettings.Clock_Format24;
             RealTimeClock.IsChecked = ButtonBindSettings.RealTimeClock;
             GetMemoryDataThreadTimeout.Value = ButtonBindSettings.GetMemoryDataThreadTimeout;
             DataUpdateThreadTimeout.Value = ButtonBindSettings.DataUpdateThreadTimeout;
+            ConsUpdateThreadTimeout.Value = ButtonBindSettings.ConsUpdateThreadTimeout;
             message_text.Text = "";
         }
 
-        private void SaveSetting()
+        private async Task SaveSettingAsync()
          {
             JObject JSONdata = new JObject(
                    new JProperty("Clock_Format24", ButtonBindSettings.Clock_Format24),
                    new JProperty("RealTimeClock", ButtonBindSettings.RealTimeClock),
                    new JProperty("GetMemoryDataThreadTimeout", ButtonBindSettings.GetMemoryDataThreadTimeout),
-                   new JProperty("DataUpdateThreadTimeout", ButtonBindSettings.DataUpdateThreadTimeout));
+                   new JProperty("DataUpdateThreadTimeout", ButtonBindSettings.DataUpdateThreadTimeout),
+                   new JProperty("ConsUpdateThreadTimeout", ButtonBindSettings.ConsUpdateThreadTimeout));
+
             //string settings_path = AccData.path;
             try
             {
                 // create/write settings file
                 File.WriteAllText(LMURepairAndRefuelData.path, JSONdata.ToString());
+                message_text.Text = "Saving config...";
+                await Task.Delay(2000);
+                message_text.Text = "";
                 Logging.Current.Info("Plugin georace.lmuDataPlugin - Settings file saved to : " + System.Environment.CurrentDirectory + "\\" + LMURepairAndRefuelData.path);
             }
             catch
@@ -154,38 +170,51 @@ namespace Redadeg.lmuDataPlugin
         {
             ButtonBindSettings.Clock_Format24 = true;
             message_text.Text = "";
-            SaveSetting();
+            SaveSettingAsync();
         }
         private void clock_format24_unChecked(object sender, RoutedEventArgs e)
         {
             ButtonBindSettings.Clock_Format24 = false;
             message_text.Text = "";
-            SaveSetting();
+            SaveSettingAsync();
         }
 
         private void RealTimeClock_Checked(object sender, RoutedEventArgs e)
         {
             ButtonBindSettings.RealTimeClock = true;
             message_text.Text = "";
-            SaveSetting();
+            SaveSettingAsync();
         }
         private void RealTimeClock_unChecked(object sender, RoutedEventArgs e)
         {
             ButtonBindSettings.RealTimeClock = false;
             message_text.Text = "";
-            SaveSetting();
+            SaveSettingAsync();
         }
 
         private void GetMemoryDataThreadTimeout_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double?> e)
         {
-            ButtonBindSettings.GetMemoryDataThreadTimeout = (int)GetMemoryDataThreadTimeout.Value;
-            SaveSetting();
+            if (GetMemoryDataThreadTimeout.Value != null) { 
+                ButtonBindSettings.GetMemoryDataThreadTimeout = (int)GetMemoryDataThreadTimeout.Value;
+                SaveSettingAsync();
+            }
         }
 
         private void DataUpdateThreadTimeout_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double?> e)
         {
-            ButtonBindSettings.DataUpdateThreadTimeout = (int)DataUpdateThreadTimeout.Value;
-            SaveSetting();
+            if (DataUpdateThreadTimeout.Value != null) { 
+                ButtonBindSettings.DataUpdateThreadTimeout = (int)DataUpdateThreadTimeout.Value;
+                SaveSettingAsync();
+            }
+        }
+
+        private void ConsUpdateThreadTimeout_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double?> e)
+        {
+            if (ConsUpdateThreadTimeout.Value != null)
+            {
+                ButtonBindSettings.ConsUpdateThreadTimeout = (int)ConsUpdateThreadTimeout.Value;
+                SaveSettingAsync();
+            }
         }
     }
    public class LMU_EnegryAndFuelCalculation
@@ -205,11 +234,12 @@ namespace Redadeg.lmuDataPlugin
     }
 
 
-        public class ButtonBindSettings
+    public class ButtonBindSettings
     {
         public static bool RealTimeClock { get; set; }
         public static bool Clock_Format24 { get; set; }
         public static int DataUpdateThreadTimeout { get; set; }
+        public static int ConsUpdateThreadTimeout { get; set; }
         public static int GetMemoryDataThreadTimeout { get; set; }
 
     }
